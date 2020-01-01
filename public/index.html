@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+
+<body>
+  <p>
+    用户：<input type="text" name="username">
+  </p>
+  <p>
+    密码：<input type="password" name="password">
+  </p>
+  <p>
+    <button>提交</button>
+    <a href="javascript:void 0" id="profile">用户中心</a>
+    <a href="javascript:void 0" id="logout">退出</a>
+  </p>
+  <script src="./jquery.min.js"></script>
+  <script>
+    $(function () {
+      $('button').click(function () {
+        const username = $(':text').val()
+        const password = $(':password').val()
+        if (!username || !password) return void alert('请输入用户名或密码')
+        $.post('/login', { username, password }, ({ data }) => {
+          console.log(data)
+          // 保存到 localStrong 中
+          localStorage.setItem('token', data.token)
+          alert('登录成功')
+        })
+      })
+      // 用户中心
+      $('#profile').click(function () {
+        $.ajax({
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          },
+          type: 'GET',
+          url: '/profile',
+          success: ({ data }) => {
+            console.log(data)
+            alert(`欢迎用户：${data.username} 的归来`)
+          },
+          error: err => {
+            console.log(err)
+            alert('进入用户中心失败')
+          }
+        })
+      })
+      // 退出
+      $('#logout').click(function () {
+        localStorage.clear()
+      })
+    })
+  </script>
+</body>
+
+</html>
